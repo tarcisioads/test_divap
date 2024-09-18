@@ -31,7 +31,17 @@ app.get('/alert', async (req, res) => {
   res.json(alerts);
 });
 
-app.post('/alert', async (req, res) => {
+app.get('/alert/open', async (req, res) => {
+  const alerts = await Alert.findAll({
+    where: {
+      readed: false,
+    }
+  });
+  res.json(alerts);
+});
+
+
+app.post('/alert', async (req, res) => {:q
   const alert = await Alert.create(req.body);
   res.json(alert);
 });
