@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { Sequelize, Model, DataTypes } = require('sequelize');
+const { Sequelize, Model, DataTypes, Op } = require('sequelize');
 
 const app = express();
 const port = 3099;
@@ -38,13 +38,13 @@ app.get('/alert', async (req, res) => {
 app.get('/alert/open', async (req, res) => {
   const alerts = await Alert.findAll({
     where: {
-      readed: false,
+      [Op.or]: [{ readed:false }, { readed: null }]
     }
   });
   res.json(alerts);
 });
 
-app.put('/alert/:id', async (req, res) => {
+app.get('/alert/:id', async (req, res) => {
   const alert = await Alert.findByPk(req.params.id);
   if (alert) {
     await alert.update(req.body);
