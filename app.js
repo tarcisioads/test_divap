@@ -17,9 +17,18 @@ Alert.init({
   content: DataTypes.STRING,
   open_trade_result: DataTypes.STRING,
   open_trade_short_result: DataTypes.STRING,
+  open_trade_long_alvo1: DataTypes.STRING,
+  open_trade_short_alvo1: DataTypes.STRING,
+  open_trade_long_alvo2: DataTypes.STRING,
+  open_trade_short_alvo2: DataTypes.STRING,
+  open_trade_long_tailingstop: DataTypes.STRING,
+  open_trade_short_tailingstop: DataTypes.STRING,
   trade_id: DataTypes.STRING,
   trade_id_short: DataTypes.STRING,
-  readed: DataTypes.BOOLEAN
+  readed: DataTypes.BOOLEAN,
+  leverage_long_result: DataTypes.STRING,
+  leverage_short_result: DataTypes.STRING,
+
 }, { sequelize, modelName: 'alert' });
 
 // Sync models with database
