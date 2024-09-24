@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { Sequelize, Model, DataTypes, Op } = require('sequelize');
+const appWs = require('./app-ws')
 
 const app = express();
 const port = 3099;
@@ -80,13 +81,15 @@ app.get('/alert/trade/:id', async (req, res) => {
 
 app.post('/alert', async (req, res) => {
   const alert = await Alert.create(req.body);
+  wss.broadcast(alert)
   res.json(alert);
 });
 
 app.put('/alert/:id', async (req, res) => {
   const alert = await Alert.findByPk(req.params.id);
   if (alert) {
-    await alert.update(req.body);
+    const update_alert = await alert.update(req.body);
+    wss.broadcast(update_alert)
     res.json(alert);
   } else {
     res.status(404).json({ message: 'Alert not found' });
@@ -95,7 +98,19 @@ app.put('/alert/:id', async (req, res) => {
 
 
 // Start server
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
 
+const wss = appWs(server)
+
+
+setTimeout(async () => {
+    const alerts = await Alert.findAll({
+      where: {
+        [Op.or]: [{ readed:false }, { readed: null }]
+      }
+    });
+ 
+    wss.broadcast(alerts);
+}, 1000)
