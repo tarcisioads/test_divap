@@ -13,7 +13,7 @@ const sequelize = new Sequelize({
 });
 
 // Define User model
-class Alert extends Model {}
+class Alert extends Model { }
 Alert.init({
   content: DataTypes.STRING,
   open_trade_result: DataTypes.STRING,
@@ -48,11 +48,31 @@ app.get('/alert', async (req, res) => {
 app.get('/alert/open', async (req, res) => {
   const alerts = await Alert.findAll({
     where: {
-      [Op.or]: [{ readed:false }, { readed: null }]
+      [Op.or]: [{ readed: false }, { readed: null }]
     }
   });
   res.json(alerts);
 });
+
+app.get('/alert/closeall', async (req, res) => {
+
+  await Alert.update(
+    { readed: true },
+    {
+      where:
+      {
+        [Op.or]: [{ readed: false }, { readed: null }]
+      }
+    })
+
+  const alerts = await Alert.findAll({
+    where: {
+      [Op.or]: [{ readed: false }, { readed: null }]
+    }
+  });
+  res.json(alerts);
+});
+
 
 app.get('/alert/:id', async (req, res) => {
   const alert = await Alert.findByPk(req.params.id);
@@ -75,7 +95,7 @@ app.get('/alert/trade/:id', async (req, res) => {
       trade_id_short: req.params.id,
     }
   });
-  const alerts = alerts_long.concat(alerts_shorts) 
+  const alerts = alerts_long.concat(alerts_shorts)
   res.json(alerts);
 });
 
@@ -106,11 +126,11 @@ const wss = appWs(server)
 
 
 setTimeout(async () => {
-    const alerts = await Alert.findAll({
-      where: {
-        [Op.or]: [{ readed:false }, { readed: null }]
-      }
-    });
- 
-    wss.broadcast(alerts);
+  const alerts = await Alert.findAll({
+    where: {
+      [Op.or]: [{ readed: false }, { readed: null }]
+    }
+  });
+
+  wss.broadcast(alerts);
 }, 1000)
